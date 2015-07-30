@@ -51,11 +51,13 @@
   <h1>Spyfall</h1>
 
     <form method="post" action="join">
-      <h2>Lobby Code: 3x4G</h2>
+      <h2>Lobby Code: {{.Code}}</h2>
       Players:
       <ul id="players">
       </ul>
+      {{if .Admin}}
       <button type="submit">Start</button>
+      {{end}}
     </form>
   </section>
 </body>
