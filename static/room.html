@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spyfall Companion</title>
+  <link rel="stylesheet" media="screen" href="https://raw.github.com/necolas/normalize.css/master/normalize.css">
+  <link rel="stylesheet" type="text/css" href="//yegor256.github.io/tacit/tacit.min.css"/>
+  <style>
+  </style>
+  <script>
+  var interval;
+    document.addEventListener('DOMContentLoaded', function () {
+      listPlayers();
+      setInterval(listPlayers, 2000);
+    });
+
+  function listPlayers() {
+    console.log("checking players");
+    var request = new XMLHttpRequest();
+    request.open('GET', 'players.json?' + (new Date()).getTime(), true);
+
+    request.onload = function() {
+      if (this.status >= 200 && this.status < 400) {
+        // Success!
+        var data = JSON.parse(this.response);
+        var html = "";
+        data.forEach(function(element, index, array) {
+          html += '<li style="color: ' + element.color + '">' + element.name + '</li>';
+        });
+        var p = document.getElementById("players");
+        p.innerHTML = html;
+      } else {
+        // We reached our target server, but it returned an error
+
+      }
+    };
+
+    request.onerror = function() {
+      // There was a connection error of some sort
+    };
+
+    request.send();
+  }
+
+
+  </script>
+</head>
+<body>
+  <section>
+  <h1>Spyfall</h1>
+
+    <form method="post" action="join">
+      <h2>Lobby Code: 3x4G</h2>
+      Players:
+      <ul id="players">
+      </ul>
+      <button type="submit">Start</button>
+    </form>
+  </section>
+</body>
+</html>
