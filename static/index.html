@@ -12,13 +12,13 @@
 <body>
   <section>
   <h1>Spyfall</h1>
-    <form method="get" action="create">
-      <button type="submit">Create Lobby</button>
+    <form method="get" action="/room/new">
+      <button type="submit">Create Room</button>
     </form>
-    <form method="post" action="join">
+    <form method="post" action="/room/join">
       <h2>Join an existing lobby.</h2>
-      <input name="lobbyID" type="text" id="lobbyID" size="25" placeholder="Enter Lobby ID."/>
-      <button type="submit">Join</button>
+      <input name="lobbyID" type="text" id="lobbyID" size="25" placeholder="Enter Room Code."/>
+      <button type="submit">Play</button>
     </form>
   </section>
 </body>
