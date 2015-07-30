@@ -29,7 +29,7 @@ func main() {
 
 	http.HandleFunc("/join", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			http.NotFound(w, r)
+			http.NotFound(w, r) // w.WriteHeader(http.StatusMethodNotAllowed) return
 			return
 		}
 		r.ParseForm()
