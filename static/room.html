@@ -16,8 +16,7 @@
   function listPlayers() {
     console.log("checking players");
     var request = new XMLHttpRequest();
-    request.open('GET', 'players.json?' + (new Date()).getTime(), true);
-
+    request.open('GET', '/players.json?' + (new Date()).getTime(), true);
     request.onload = function() {
       if (this.status >= 200 && this.status < 400) {
         // Success!
@@ -30,18 +29,13 @@
         p.innerHTML = html;
       } else {
         // We reached our target server, but it returned an error
-
       }
     };
-
     request.onerror = function() {
       // There was a connection error of some sort
     };
-
     request.send();
   }
-
-
   </script>
 </head>
 <body>
