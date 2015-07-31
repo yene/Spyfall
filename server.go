@@ -96,13 +96,16 @@ func main() {
 	}
 
 	http.HandleFunc("/players.json", func(w http.ResponseWriter, r *http.Request) {
-		lobbyCode := r.FormValue("code") // req.URL.Query().Get("token")
+		lobbyCode := r.URL.Query().Get("code")
+		if len(lobbyCode) != 4 { // Error: no code provided
+			http.NotFound(w, r)
+			return
+		}
 		hd := hashids.NewData()
 		hd.Salt = "super secret salt"
 		h := hashids.NewWithData(hd)
 		d := h.Decode(lobbyCode)
-		fmt.Println("requesting players for room", d)
-		room := roomWithID(d[0])
+		room := roomWithID(d[0]) // TODO error handling when room not found
 
 		js, err := json.Marshal(room.Players)
 		if err != nil {
