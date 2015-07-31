@@ -8,6 +8,8 @@ import (
 import "github.com/speps/go-hashids"
 
 var currentGameID = 55 //P0vQ
+var rooms []Room
+var counter int = 55
 
 // fmt.Fprintf(w, "GET, %q", html.EscapeString(r.URL.Path))
 // http.Error(w, "Invalid request method.", 405)
@@ -15,6 +17,18 @@ var currentGameID = 55 //P0vQ
 type Page struct {
 	Code  string
 	Admin bool
+}
+
+type Room struct {
+	ID int
+	//Players []Player
+}
+
+type Player struct {
+	Name  string
+	Color string
+	Admin bool
+	UUID  string
 }
 
 func main() {
@@ -28,10 +42,19 @@ func main() {
 		hd.Salt = "super secret salt"
 		hd.MinLength = 4
 		h := hashids.NewWithData(hd)
-		c, _ := h.Encode([]int{currentGameID})
+		c, _ := h.Encode([]int{counter})
+
+		// create new room
+		rooms = append(rooms, Room{counter})
+		// give user a cookie with id
+
+		//
+		counter++
+
 		t, _ := template.ParseFiles("static/room.html")
 		p := &Page{Code: c, Admin: true}
 		t.Execute(w, p)
+		fmt.Println("created new room ", c)
 	})
 
 	http.HandleFunc("/room/join", func(w http.ResponseWriter, r *http.Request) {
