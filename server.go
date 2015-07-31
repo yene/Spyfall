@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"time"
 )
 import (
 	"github.com/satori/go.uuid"
@@ -48,11 +49,15 @@ func main() {
 		c, _ := h.Encode([]int{counter})
 
 		// create new room
-		admin := Player{"bob", "red", true, uuid.NewV4().String()}
+		uuidS := uuid.NewV4().String()
+		admin := Player{"Red", "red", true, uuidS}
 		players := []Player{admin}
 		rooms = append(rooms, Room{counter, players})
 
 		// give user a cookie with id
+		expiration := time.Now().Add(365 * 24 * time.Hour)
+		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Expires: expiration}
+		http.SetCookie(w, &cookie)
 
 		//
 		counter++
