@@ -1,11 +1,15 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"net/http"
 )
-import "github.com/speps/go-hashids"
+import (
+	"github.com/satori/go.uuid"
+	"github.com/speps/go-hashids"
+)
 
 var currentGameID = 55 //P0vQ
 var rooms []Room
@@ -20,19 +24,18 @@ type Page struct {
 }
 
 type Room struct {
-	ID int
-	//Players []Player
+	ID      int
+	Players []Player
 }
 
 type Player struct {
-	Name  string
-	Color string
-	Admin bool
-	UUID  string
+	Name  string `json:"name"`
+	Color string `json:"color"`
+	Admin bool   `json:"-"`
+	UUID  string `json:"-"`
 }
 
 func main() {
-	http.Handle("/", http.FileServer(http.Dir("./static")))
 	http.HandleFunc("/room/new", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.NotFound(w, r)
@@ -45,7 +48,10 @@ func main() {
 		c, _ := h.Encode([]int{counter})
 
 		// create new room
-		rooms = append(rooms, Room{counter})
+		admin := Player{"bob", "red", true, uuid.NewV4().String()}
+		players := []Player{admin}
+		rooms = append(rooms, Room{counter, players})
+
 		// give user a cookie with id
 
 		//
@@ -63,15 +69,15 @@ func main() {
 			return
 		}
 		r.ParseForm()
-		lobbyID := r.Form["lobbyID"][0]
+		lobbyCode := r.Form["lobbyCode"][0]
 		hd := hashids.NewData()
 		hd.Salt = "super secret salt"
 		h := hashids.NewWithData(hd)
-		d := h.Decode(lobbyID)
+		d := h.Decode(lobbyCode)
 		if d[0] == currentGameID {
 			fmt.Println(d)
 			t, _ := template.ParseFiles("static/room.html")
-			p := &Page{Code: lobbyID, Admin: false}
+			p := &Page{Code: lobbyCode, Admin: false}
 			t.Execute(w, p)
 		} else {
 			http.NotFound(w, r)
@@ -79,5 +85,38 @@ func main() {
 		}
 	})
 
+	type Profile struct {
+		Name    string
+		Hobbies []string
+	}
+
+	http.HandleFunc("/players.json", func(w http.ResponseWriter, r *http.Request) {
+		lobbyCode := r.FormValue("code") // req.URL.Query().Get("token")
+		hd := hashids.NewData()
+		hd.Salt = "super secret salt"
+		h := hashids.NewWithData(hd)
+		d := h.Decode(lobbyCode)
+		fmt.Println("requesting players for room", d)
+		room := roomWithID(d[0])
+
+		js, err := json.Marshal(room.Players)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(js)
+	})
+
+	http.Handle("/", http.FileServer(http.Dir("./static")))
 	http.ListenAndServe(":3000", nil)
+}
+
+func roomWithID(id int) Room {
+	for _, r := range rooms {
+		if r.ID == id {
+			return r
+		}
+	}
+	return rooms[0]
 }
