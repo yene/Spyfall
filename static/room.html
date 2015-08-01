@@ -21,10 +21,12 @@
       if (this.status >= 200 && this.status < 400) {
         // Success!
         var data = JSON.parse(this.response);
+        var players = data.players;
         var html = "";
-        data.forEach(function(element, index, array) {
-          html += '<li style="color: ' + element.color + '">' + element.name + '</li>';
-        });
+        var arrayLength = players.length;
+        for (var i = 0; i < arrayLength; i++) {
+          html += '<li style="color: ' + players[i].color + '">' + players[i].name + '</li>';
+        }
         var p = document.getElementById("players");
         p.innerHTML = html;
       } else {
@@ -36,13 +38,14 @@
     };
     request.send();
   }
+
   </script>
 </head>
 <body>
   <section>
   <h1>Spyfall</h1>
 
-    <form method="post" action="join">
+    <form method="get" action="game?code={{.Code}}">
       <h2>Lobby Code: {{.Code}}</h2>
       Players:
       <ul id="players">
