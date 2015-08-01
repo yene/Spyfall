@@ -20,8 +20,13 @@
     request.onload = function() {
       if (this.status >= 200 && this.status < 400) {
         // Success!
-        var data = JSON.parse(this.response);
-        var players = data.players;
+        var room = JSON.parse(this.response);
+        if (room.started) {
+          window.location = "/room?code=" + room.code;
+          return;
+        }
+
+        var players = room.players;
         var html = "";
         var arrayLength = players.length;
         for (var i = 0; i < arrayLength; i++) {

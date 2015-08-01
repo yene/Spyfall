@@ -31,6 +31,7 @@ type PageGame struct {
 
 type Room struct {
 	ID      int
+	Code    string   `json:"code"`
 	Players []Player `json:"players"`
 	Started bool     `json:"started"`
 }
@@ -58,7 +59,7 @@ func main() {
 		uuidS := uuid.NewV4().String()
 		admin := Player{"Red", "red", true, uuidS}
 		players := []Player{admin}
-		rooms = append(rooms, Room{ID: counter, Players: players, Started: false})
+		rooms = append(rooms, Room{ID: counter, Code: c, Players: players, Started: false})
 
 		// give user a cookie with id
 		expiration := time.Now().Add(365 * 24 * time.Hour)
