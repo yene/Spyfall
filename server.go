@@ -36,7 +36,7 @@ type PageLobby struct {
 
 type PageGame struct {
 	Role     string
-	Location string
+	Location int
 	Cards    []Card
 }
 
@@ -128,14 +128,12 @@ func main() {
 				room.setup()
 				fmt.Println("Started room", roomID)
 			}
-			t, _ := template.ParseFiles("static/game.html")
-			location := cards[room.Location].Name
-			p := &PageGame{Role: "Penis", Location: location, Cards: cards}
+			t, err := template.ParseFiles("static/game.html")
+			if err != nil {
+				fmt.Println(err)
+			}
+			p := &PageGame{Role: "Penis", Location: room.Location, Cards: cards}
 			t.Execute(w, p)
-			// if game not started, start game
-			// tell the other players to go to game
-
-			// send room
 		} else {
 			http.NotFound(w, r)
 			return

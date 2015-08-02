@@ -8,11 +8,16 @@
 </head>
 <body>
   <section>
-  <h1>Spyfall</h1>
+  <h1><a href="/">Spyfall</a></h1>
   <p>You are role  {{.Role}}</p>
-  Locations: {{.Location}}
+  {{$l := index .Cards .Location}}
+  Locations: {{$l.Name}}
   <ul>
-    {{range .Cards}}
+    {{ $b := .Location }}
+    {{range $index, $element := .Cards}}
+    {{if eq $index $b }}
+    WE ARE HERE
+    {{end}}
     <li><img src="/cards/{{.Path}}">{{.Name}}</li>
     {{end}}
   </ul>
