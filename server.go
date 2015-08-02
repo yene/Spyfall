@@ -14,7 +14,7 @@ import (
 )
 
 var currentGameID = 55 //P0vQ
-var rooms []Room
+var rooms = make(map[int]*Room)
 var counter int = 55
 
 // fmt.Fprintf(w, "GET, %q", html.EscapeString(r.URL.Path))
@@ -44,6 +44,10 @@ type Player struct {
 	UUID  string `json:"-"`
 }
 
+func (r *Room) setup() {
+	r.Started = true
+}
+
 func main() {
 	http.HandleFunc("/room/new", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -60,7 +64,7 @@ func main() {
 		uuidS := uuid.NewV4().String()
 		admin := Player{"Red", "red", true, uuidS}
 		players := []Player{admin}
-		rooms = append(rooms, Room{ID: counter, Players: players, Started: false})
+		rooms[counter] = &Room{ID: counter, Players: players, Started: false}
 
 		// give user a cookie with id
 		expiration := time.Now().Add(365 * 24 * time.Hour)
@@ -104,16 +108,22 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		room := roomWithID(roomID) // TODO error handling when room not found
-		fmt.Println(room.ID)
-		t, _ := template.ParseFiles("static/game.html")
-		p := &PageGame{Role: "Penis", Location: "airport"}
-		t.Execute(w, p)
-		// if game not started, start game
-		// tell the other players to go to game
+		if room, ok := rooms[roomID]; ok {
+			if room.Started == false {
+				room.setup()
+				fmt.Println("Started room", roomID)
+			}
+			t, _ := template.ParseFiles("static/game.html")
+			p := &PageGame{Role: "Penis", Location: "airport"}
+			t.Execute(w, p)
+			// if game not started, start game
+			// tell the other players to go to game
 
-		// send room
-
+			// send room
+		} else {
+			http.NotFound(w, r)
+			return
+		}
 	})
 
 	type Profile struct {
@@ -128,29 +138,24 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		room := roomWithID(roomID)
+		if room, ok := rooms[roomID]; ok {
 
-		fmt.Println("requesting players for", roomIDStr)
+			fmt.Println("requesting players for", roomIDStr)
 
-		// if room started tell player to redirect to room?code=2323
-		js, err := json.Marshal(room)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			// if room started tell player to redirect to room?code=2323
+			js, err := json.Marshal(room)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json")
+			w.Write(js)
+		} else {
+			http.NotFound(w, r)
 			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.Write(js)
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 	http.ListenAndServe(":3000", nil)
-}
-
-func roomWithID(id int) Room {
-	for _, r := range rooms {
-		if r.ID == id {
-			return r
-		}
-	}
-	return rooms[0]
 }
