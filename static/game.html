@@ -8,10 +8,13 @@
 </head>
 <body>
   <section>
-  <h1><a href="/">Spyfall</a></h1>
-  <p>You are role  {{.Role}}</p>
-  {{$l := index .Cards .Location}}
-  Locations: {{$l.Name}}
+  <a href="/"><h1>Spyfall</h1></a>
+  {{ if .Spy }}
+    <p>You are the Spy</p>
+  {{ else }}
+    {{$l := index .Cards .Location}}
+    <p>Locations: {{$l.Name}}</p>
+  {{ end }}
   <ul>
     {{ $b := .Location }}
     {{range $index, $element := .Cards}}

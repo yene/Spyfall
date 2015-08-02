@@ -48,14 +48,14 @@
 </head>
 <body>
   <section>
-  <h1>Spyfall</h1>
-      <h2>Lobby Code: {{.Code}}</h2>
-      Players:
-      <ul id="players">
-      </ul>
-      {{if .Admin}}
-      <button type="submit" onclick="window.location='/game?id={{.ID}}'">Start</button>
-      {{end}}
+  <a href="/"><h1>Spyfall</h1></a>
+  <h2>Lobby Code: {{.Code}}</h2>
+  Players:
+  <ul id="players">
+  </ul>
+  {{if .Admin}}
+  <button type="submit" onclick="window.location='/game?id={{.ID}}'">Start</button>
+  {{end}}
   </section>
 </body>
 </html>

@@ -35,7 +35,7 @@ type PageLobby struct {
 }
 
 type PageGame struct {
-	Role     string
+	Spy      bool
 	Location int
 	Cards    []Card
 }
@@ -52,10 +52,13 @@ type Player struct {
 	Color string `json:"color"`
 	Admin bool   `json:"-"`
 	UUID  string `json:"-"`
+	Spy   bool
 }
 
 func (r *Room) setup() {
 	r.Location = rand.Intn(len(cards))
+	spy := rand.Intn(len(r.Players))
+	r.Players[spy].Spy = true
 	r.Started = true
 
 }
@@ -77,14 +80,15 @@ func main() {
 
 		// create new room
 		uuidS := uuid.NewV4().String()
-		admin := Player{"Red", "red", true, uuidS}
+		admin := Player{"Red", "red", true, uuidS, false}
 		players := []Player{admin}
 		rooms[counter] = &Room{ID: counter, Players: players, Started: false}
 
 		// give user a cookie with id
 		expiration := time.Now().Add(365 * 24 * time.Hour)
-		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Expires: expiration}
+		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 		http.SetCookie(w, &cookie)
+		fmt.Println("setting cookie", cookie)
 
 		t, _ := template.ParseFiles("static/room.html")
 		p := &PageLobby{Code: c, ID: counter, Admin: true}
@@ -133,11 +137,11 @@ func main() {
 				room.setup()
 				fmt.Println("Started room", roomID)
 			}
-			t, err := template.ParseFiles("static/game.html")
-			if err != nil {
-				fmt.Println(err)
-			}
-			p := &PageGame{Role: "Penis", Location: room.Location, Cards: cards}
+			t, _ := template.ParseFiles("static/game.html")
+			cookies := r.Cookies()
+			fmt.Println("cooikies: ", cookies)
+
+			p := &PageGame{Spy: true, Location: room.Location, Cards: cards}
 			t.Execute(w, p)
 		} else {
 			http.NotFound(w, r)
