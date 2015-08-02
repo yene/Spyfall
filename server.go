@@ -90,13 +90,13 @@ func main() {
 		hd.Salt = "super secret salt"
 		h := hashids.NewWithData(hd)
 		d := h.Decode(lobbyCode)
-		if d[0] == currentGameID {
-			fmt.Println(d)
+		roomID := d[0]
+		if _, ok := rooms[roomID]; ok {
 			t, _ := template.ParseFiles("static/room.html")
 			p := &PageLobby{Code: lobbyCode, ID: d[0], Admin: false}
 			t.Execute(w, p)
 		} else {
-			http.NotFound(w, r)
+			http.Redirect(w, r, "/", 303)
 			return
 		}
 	})
