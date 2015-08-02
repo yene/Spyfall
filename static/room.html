@@ -16,13 +16,13 @@
   function listPlayers() {
     console.log("checking players");
     var request = new XMLHttpRequest();
-    request.open('GET', '/players.json?code={{.Code}}&t=' + (new Date()).getTime(), true);
+    request.open('GET', '/players.json?id={{.ID}}&t=' + (new Date()).getTime(), true);
     request.onload = function() {
       if (this.status >= 200 && this.status < 400) {
         // Success!
         var room = JSON.parse(this.response);
         if (room.started) {
-          window.location = "/room?code=" + room.code;
+          window.location = "/game?id=" + room.ID;
           return;
         }
 
@@ -50,7 +50,7 @@
   <section>
   <h1>Spyfall</h1>
 
-    <form method="get" action="game?code={{.Code}}">
+    <form method="get" action="/game?id={{.ID}}">
       <h2>Lobby Code: {{.Code}}</h2>
       Players:
       <ul id="players">
