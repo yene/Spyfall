@@ -55,6 +55,15 @@ type Player struct {
 	Spy   bool
 }
 
+func (r Room) playerForUUID(uuid string) Player {
+	for _, value := range r.Players {
+		if value.UUID == uuid {
+			return value
+		}
+	}
+	return Player{"Grey", "grey", false, "", false} // return error
+}
+
 func (r *Room) setup() {
 	r.Location = rand.Intn(len(cards))
 	spy := rand.Intn(len(r.Players))
@@ -88,7 +97,6 @@ func main() {
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 		http.SetCookie(w, &cookie)
-		fmt.Println("setting cookie", cookie)
 
 		t, _ := template.ParseFiles("static/room.html")
 		p := &PageLobby{Code: c, ID: counter, Admin: true}
@@ -138,10 +146,11 @@ func main() {
 				fmt.Println("Started room", roomID)
 			}
 			t, _ := template.ParseFiles("static/game.html")
-			cookies := r.Cookies()
-			fmt.Println("cooikies: ", cookies)
+			cookie := r.Cookies()[0]
+			uuid := cookie.Value
+			player := room.playerForUUID(uuid)
 
-			p := &PageGame{Spy: true, Location: room.Location, Cards: cards}
+			p := &PageGame{Spy: player.Spy, Location: room.Location, Cards: cards}
 			t.Execute(w, p)
 		} else {
 			http.NotFound(w, r)
