@@ -106,7 +106,12 @@ func main() {
 		h := hashids.NewWithData(hd)
 		d := h.Decode(lobbyCode)
 		roomID := d[0]
-		if _, ok := rooms[roomID]; ok {
+		if room, ok := rooms[roomID]; ok {
+			if room.Started {
+				http.Redirect(w, r, "/", 303)
+				return
+			}
+
 			t, _ := template.ParseFiles("static/room.html")
 			p := &PageLobby{Code: lobbyCode, ID: d[0], Admin: false}
 			t.Execute(w, p)
