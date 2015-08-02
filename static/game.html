@@ -12,9 +12,9 @@
   <p>You are role  {{.Role}}</p>
   Locations: {{.Location}}
   <ul>
-    <li><img src="cards/trainstation.jpg"></li>
-    <li><img src="cards/trainstation.jpg"></li>
-    <li><img src="cards/trainstation.jpg"></li>
+    {{range .Cards}}
+    <li><img src="/cards/{{.Path}}">{{.Name}}</li>
+    {{end}}
   </ul>
   <!-- http://themarklee.com/2013/12/26/simple-diy-responsive-slideshow-made-html5-css3-javascript/ -->
   </section>

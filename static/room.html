@@ -50,15 +50,15 @@
   <section>
   <h1>Spyfall</h1>
 
-    <form method="get" action="/game?id={{.ID}}">
+
       <h2>Lobby Code: {{.Code}}</h2>
       Players:
       <ul id="players">
       </ul>
       {{if .Admin}}
-      <button type="submit">Start</button>
+      <button type="submit" onclick="window.location='/game?id={{.ID}}'">Start</button>
       {{end}}
-    </form>
+
   </section>
 </body>
 </html>

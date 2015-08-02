@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io/ioutil"
+	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,9 +18,15 @@ import (
 var currentGameID = 55 //P0vQ
 var rooms = make(map[int]*Room)
 var counter int = 55
+var cards []Card
 
 // fmt.Fprintf(w, "GET, %q", html.EscapeString(r.URL.Path))
 // http.Error(w, "Invalid request method.", 405)
+
+type Card struct {
+	Name string `json:"name"`
+	Path string `json:"path"`
+}
 
 type PageLobby struct {
 	ID    int
@@ -29,12 +37,14 @@ type PageLobby struct {
 type PageGame struct {
 	Role     string
 	Location string
+	Cards    []Card
 }
 
 type Room struct {
-	ID      int
-	Players []Player `json:"players"`
-	Started bool     `json:"started"`
+	ID       int
+	Players  []Player `json:"players"`
+	Started  bool     `json:"started"`
+	Location int
 }
 
 type Player struct {
@@ -45,10 +55,15 @@ type Player struct {
 }
 
 func (r *Room) setup() {
+	r.Location = rand.Intn(len(cards))
 	r.Started = true
+
 }
 
 func main() {
+	cardsJSON, _ := ioutil.ReadFile("static/cards/cards.json")
+	json.Unmarshal([]byte(cardsJSON), &cards)
+
 	http.HandleFunc("/room/new", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.NotFound(w, r)
@@ -114,7 +129,8 @@ func main() {
 				fmt.Println("Started room", roomID)
 			}
 			t, _ := template.ParseFiles("static/game.html")
-			p := &PageGame{Role: "Penis", Location: "airport"}
+			location := cards[room.Location].Name
+			p := &PageGame{Role: "Penis", Location: location, Cards: cards}
 			t.Execute(w, p)
 			// if game not started, start game
 			// tell the other players to go to game
