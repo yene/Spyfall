@@ -33,6 +33,36 @@ function updateCountdown() {
 }
 
 </script>
+<style>
+ul {
+  margin: 0;
+  list-style-type: none;
+  display: inline-flex;
+}
+
+figure {
+     position: relative;
+}
+figure img {
+    display: block;
+}
+figcaption {
+    background: rgba(0, 0, 0, 0.5);
+    color: #FFF;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding-left: 10px;
+    font-size: 30px;
+    line-height: 40px;
+}
+
+.currentLocation {
+  color: red;
+}
+
+</style>
 <body>
   <section>
   <a href="/"><h1>Spyfall</h1></a>
@@ -44,12 +74,19 @@ function updateCountdown() {
     <p>Locations: {{$l.Name}}</p>
   {{ end }}
   <ul>
-    {{ $b := .Location }}
     {{range $index, $element := .Cards}}
-    {{if eq $index $b }}
-    WE ARE HERE
-    {{end}}
-    <li><img src="/cards/{{.Path}}">{{.Name}}</li>
+    <li>
+      <figure>
+        <img src="/cards/{{.Path}}" width="960" height="600">
+        {{if $.Spy }}
+        <figcaption>{{.Name}}</figcaption>
+        {{else if eq $index $.Location }}
+        <figcaption class="currentLocation">{{.Name}}</figcaption>
+        {{ else }}
+        <figcaption>{{.Name}}</figcaption>
+        {{end}}
+      </figure>
+    </li>
     {{end}}
   </ul>
   </section>
