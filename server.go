@@ -43,8 +43,8 @@ type Room struct {
 	ID        int
 	Players   []Player `json:"players"`
 	Started   bool     `json:"started"`
-	Location  int
-	Countdown int
+	Location  int      `json:"-"`
+	Countdown int      `json:"-"`
 }
 
 type Player struct {
@@ -52,7 +52,7 @@ type Player struct {
 	Color string `json:"color"`
 	Admin bool   `json:"-"`
 	UUID  string `json:"-"`
-	Spy   bool
+	Spy   bool   `json:"-"`
 }
 
 func (r Room) playerForUUID(uuid string) Player {
