@@ -15,6 +15,8 @@ document.addEventListener("DOMContentLoaded", function(event) {
 });
 
 function updateCountdown() {
+  var cd = document.getElementById("countdown");
+
   var d = new Date().getTime();
   var timestamp = Math.floor(d / 1000);
   var diff = {{ .Countdown }} - timestamp;
@@ -24,7 +26,6 @@ function updateCountdown() {
     return;
   }
 
-  var cd = document.getElementById("countdown");
   var minute = Math.floor(diff / 60);
   var seconds = diff - (minute * 60);
   seconds = seconds < 10 ? "0" + seconds : seconds; // add leading 0
