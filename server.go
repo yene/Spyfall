@@ -2,9 +2,11 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"html/template"
 	"io/ioutil"
+	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
@@ -80,6 +82,11 @@ func (r *Room) setup() {
 }
 
 func main() {
+	var (
+		httpAddr = flag.String("http", ":3000", "HTTP service address")
+	)
+	flag.Parse()
+
 	cardsJSON, _ := ioutil.ReadFile("static/cards/cards.json")
 	json.Unmarshal([]byte(cardsJSON), &cards)
 
@@ -199,6 +206,6 @@ func main() {
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./static")))
-	fmt.Println("starting on port 3000")
-	http.ListenAndServe(":3000", nil)
+	fmt.Println("listen on", *httpAddr)
+	log.Fatal(http.ListenAndServe(*httpAddr, nil))
 }
