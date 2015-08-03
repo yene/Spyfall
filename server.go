@@ -27,9 +27,9 @@ type Card struct {
 }
 
 type PageLobby struct {
-	ID    int
-	Code  string
-	Admin bool
+	ID     int
+	Code   string
+	Player Player
 }
 
 type PageGame struct {
@@ -97,7 +97,7 @@ func main() {
 
 		// create new room
 		uuidS := uuid.NewV4().String()
-		admin := Player{colors[0], colors[0], true, uuidS, false}
+		admin := Player{Name: colors[0], Color: colors[0], Admin: true, UUID: uuidS, Spy: false}
 		players := []Player{admin}
 		rooms[counter] = &Room{ID: counter, Players: players, Started: false}
 
@@ -107,7 +107,7 @@ func main() {
 		http.SetCookie(w, &cookie)
 
 		t, _ := template.ParseFiles("static/room.html")
-		p := &PageLobby{Code: c, ID: counter, Admin: true}
+		p := &PageLobby{Code: c, ID: counter, Player: admin}
 		t.Execute(w, p)
 		fmt.Println("created new room", c, counter)
 
@@ -132,7 +132,7 @@ func main() {
 			// create player, with unused color
 			uuidS := uuid.NewV4().String()
 			color := colors[len(room.Players)]
-			player := Player{color, color, false, uuidS, false}
+			player := Player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
 
 			// set cookie with uuid
 			expiration := time.Now().Add(365 * 24 * time.Hour)
@@ -143,7 +143,7 @@ func main() {
 			room.Players = append(room.Players, player)
 
 			t, _ := template.ParseFiles("static/room.html")
-			p := &PageLobby{Code: c, ID: roomID, Admin: false}
+			p := &PageLobby{Code: c, ID: roomID, Player: player}
 			t.Execute(w, p)
 		} else {
 			http.Redirect(w, r, "/", 303)

@@ -26,7 +26,11 @@
         var html = "";
         var arrayLength = players.length;
         for (var i = 0; i < arrayLength; i++) {
-          html += '<li style="color: ' + players[i].color + '">' + players[i].name + '</li>';
+          html += '<li style="color: ' + players[i].color + '">' + players[i].name;
+          if (players[i].name == {{.Player.Name}}) {
+            html += ' <span style="color:black;">(you)</span> ';
+          }
+          html += '</li>';
         }
         var p = document.getElementById("players");
         p.innerHTML = html;
@@ -48,7 +52,7 @@
   Players:
   <ul id="players">
   </ul>
-  {{if .Admin}}
+  {{if .Player.Admin}}
   <button type="submit" onclick="window.location='/game?id={{.ID}}'">Start</button>
   {{end}}
   </section>
