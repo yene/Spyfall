@@ -199,5 +199,6 @@ func main() {
 	})
 
 	http.Handle("/", http.FileServer(http.Dir("./static")))
+	fmt.Println("starting on port 3000")
 	http.ListenAndServe(":3000", nil)
 }

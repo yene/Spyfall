@@ -16,6 +16,7 @@ fswatch-run *.go ./server.sh
 * Mobile: figure should have 100% vh/vw, the coundown and status should overlap, no whitespace
 * Test concurrency: write a http test and hammer into the server, i think there is a bug
 * split code into multiple files
+* move settings into cmd arguments
 
 ## Maybe Features
 * let the user set the countdown time
