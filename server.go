@@ -15,13 +15,10 @@ import (
 	"github.com/speps/go-hashids"
 )
 
-var currentGameID = 55 //P0vQ
 var rooms = make(map[int]*Room)
-var counter int = 55
+var counter int = 0
 var cards []Card
-
-// fmt.Fprintf(w, "GET, %q", html.EscapeString(r.URL.Path))
-// http.Error(w, "Invalid request method.", 405)
+var HashID *hashids.HashID
 
 type Card struct {
 	Name string `json:"name"`
@@ -61,7 +58,7 @@ func (r Room) playerForUUID(uuid string) Player {
 			return value
 		}
 	}
-	return Player{"Grey", "grey", false, "", false} // return error
+	return Player{"Grey", "grey", false, "", false} // TODO: return error
 }
 
 func (r *Room) setup() {
@@ -76,16 +73,17 @@ func main() {
 	cardsJSON, _ := ioutil.ReadFile("static/cards/cards.json")
 	json.Unmarshal([]byte(cardsJSON), &cards)
 
+	hd := hashids.NewData()
+	hd.Salt = "super secret salt"
+	hd.MinLength = 4
+	HashID = hashids.NewWithData(hd)
+
 	http.HandleFunc("/room/new", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.NotFound(w, r)
 			return
 		}
-		hd := hashids.NewData()
-		hd.Salt = "super secret salt"
-		hd.MinLength = 4
-		h := hashids.NewWithData(hd)
-		c, _ := h.Encode([]int{counter})
+		c, _ := HashID.Encode([]int{counter})
 
 		// create new room
 		uuidS := uuid.NewV4().String()
@@ -93,7 +91,7 @@ func main() {
 		players := []Player{admin}
 		rooms[counter] = &Room{ID: counter, Players: players, Started: false}
 
-		// give user a cookie with id
+		// give user a cookie with UUID
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 		http.SetCookie(w, &cookie)
@@ -108,15 +106,12 @@ func main() {
 
 	http.HandleFunc("/room/join", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			http.NotFound(w, r) // w.WriteHeader(http.StatusMethodNotAllowed) return
+			http.NotFound(w, r)
 			return
 		}
 		r.ParseForm()
 		lobbyCode := r.Form["lobbyCode"][0]
-		hd := hashids.NewData()
-		hd.Salt = "super secret salt"
-		h := hashids.NewWithData(hd)
-		d := h.Decode(lobbyCode)
+		d := HashID.Decode(lobbyCode)
 		roomID := d[0]
 		if room, ok := rooms[roomID]; ok {
 			if room.Started {
@@ -158,11 +153,6 @@ func main() {
 		}
 	})
 
-	type Profile struct {
-		Name    string
-		Hobbies []string
-	}
-
 	http.HandleFunc("/players.json", func(w http.ResponseWriter, r *http.Request) {
 		roomIDStr := r.URL.Query().Get("id")
 		roomID, err := strconv.Atoi(roomIDStr)
@@ -171,10 +161,6 @@ func main() {
 			return
 		}
 		if room, ok := rooms[roomID]; ok {
-
-			fmt.Println("requesting players for", roomIDStr)
-
-			// if room started tell player to redirect to room?code=2323
 			js, err := json.Marshal(room)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
