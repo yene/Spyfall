@@ -85,7 +85,8 @@ func main() {
 
 	hd := hashids.NewData()
 	hd.Salt = "super secret salt"
-	hd.MinLength = 4
+	hd.MinLength = 5
+	hd.Alphabet = "abcdefghijklmnopqrstuvwxyz"
 	HashID = hashids.NewWithData(hd)
 
 	http.HandleFunc("/room/new", func(w http.ResponseWriter, r *http.Request) {
