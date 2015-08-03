@@ -19,6 +19,7 @@ var rooms = make(map[int]*Room)
 var counter int = 0
 var cards []Card
 var HashID *hashids.HashID
+var colors = []string{"Magenta", "LightSlateGray", "PaleVioletRed", "Peru", "RebeccaPurple", "LightSeaGreen", "Tomato", "SeaGreen", "Maroon", "GoldenRod", "DarkSlateBlue"}
 
 type Card struct {
 	Name string `json:"name"`
@@ -87,11 +88,11 @@ func main() {
 
 		// create new room
 		uuidS := uuid.NewV4().String()
-		admin := Player{"Red", "red", true, uuidS, false}
+		admin := Player{colors[0], colors[0], true, uuidS, false}
 		players := []Player{admin}
 		rooms[counter] = &Room{ID: counter, Players: players, Started: false}
 
-		// give user a cookie with UUID
+		// give admin a cookie with UUID
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 		http.SetCookie(w, &cookie)
@@ -110,17 +111,30 @@ func main() {
 			return
 		}
 		r.ParseForm()
-		lobbyCode := r.Form["lobbyCode"][0]
-		d := HashID.Decode(lobbyCode)
+		c := r.Form["Code"][0]
+		d := HashID.Decode(c)
 		roomID := d[0]
 		if room, ok := rooms[roomID]; ok {
 			if room.Started {
-				http.Redirect(w, r, "/", 303)
+				http.Redirect(w, r, "/", 303) // TODO: show message that room started
 				return
 			}
 
+			// create player, with unused color
+			uuidS := uuid.NewV4().String()
+			color := colors[len(room.Players)]
+			player := Player{color, color, false, uuidS, false}
+
+			// set cookie with uuid
+			expiration := time.Now().Add(365 * 24 * time.Hour)
+			cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
+			http.SetCookie(w, &cookie)
+
+			// add player to the room
+			room.Players = append(room.Players, player)
+
 			t, _ := template.ParseFiles("static/room.html")
-			p := &PageLobby{Code: lobbyCode, ID: d[0], Admin: false}
+			p := &PageLobby{Code: c, ID: roomID, Admin: false}
 			t.Execute(w, p)
 		} else {
 			http.Redirect(w, r, "/", 303)
