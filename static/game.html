@@ -6,9 +6,37 @@
   <title>Spyfall</title>
   <link rel="stylesheet" type="text/css" href="/tacit.min.css"/>
 </head>
+<script>
+var timer;
+
+document.addEventListener("DOMContentLoaded", function(event) {
+  updateCountdown();
+  timer = setInterval(updateCountdown, 1000);
+});
+
+function updateCountdown() {
+  var d = new Date().getTime();
+  var timestamp = Math.floor(d / 1000);
+  var diff = {{ .Countdown }} - timestamp;
+  if (diff < 0) {
+    cd.innerHTML = "0:00";
+    clearInterval(timer);
+    return;
+  }
+
+  var cd = document.getElementById("countdown");
+  var minute = Math.floor(diff / 60);
+  var seconds = diff - (minute * 60);
+  seconds = seconds < 10 ? "0" + seconds : seconds; // add leading 0
+
+  cd.innerHTML = minute + ":" + seconds;
+}
+
+</script>
 <body>
   <section>
   <a href="/"><h1>Spyfall</h1></a>
+  <div id="countdown"></div>
   {{ if .Spy }}
     <p>You are the Spy</p>
   {{ else }}

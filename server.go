@@ -33,16 +33,18 @@ type PageLobby struct {
 }
 
 type PageGame struct {
-	Spy      bool
-	Location int
-	Cards    []Card
+	Spy       bool
+	Location  int
+	Cards     []Card
+	Countdown int
 }
 
 type Room struct {
-	ID       int
-	Players  []Player `json:"players"`
-	Started  bool     `json:"started"`
-	Location int
+	ID        int
+	Players   []Player `json:"players"`
+	Started   bool     `json:"started"`
+	Location  int
+	Countdown int
 }
 
 type Player struct {
@@ -63,9 +65,16 @@ func (r Room) playerForUUID(uuid string) Player {
 }
 
 func (r *Room) setup() {
+	// select location
 	r.Location = rand.Intn(len(cards))
+	// assign a spy
 	spy := rand.Intn(len(r.Players))
 	r.Players[spy].Spy = true
+
+	// set the countdown
+	t := int(time.Now().Unix())
+	t = t + (60 * 10)
+	r.Countdown = t
 	r.Started = true
 
 }
@@ -159,7 +168,7 @@ func main() {
 			uuid := cookie.Value
 			player := room.playerForUUID(uuid)
 
-			p := &PageGame{Spy: player.Spy, Location: room.Location, Cards: cards}
+			p := &PageGame{Spy: player.Spy, Location: room.Location, Cards: cards, Countdown: room.Countdown}
 			t.Execute(w, p)
 		} else {
 			http.NotFound(w, r)
