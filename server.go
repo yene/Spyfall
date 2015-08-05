@@ -67,18 +67,14 @@ func (r Room) playerForUUID(uuid string) Player {
 }
 
 func (r *Room) setup() {
-	// select location
 	r.Location = rand.Intn(len(cards))
-	// assign a spy
 	spy := rand.Intn(len(r.Players))
 	r.Players[spy].Spy = true
 
-	// set the countdown
 	t := int(time.Now().Unix())
 	t = t + (60 * 10)
 	r.Countdown = t
 	r.Started = true
-
 }
 
 func main() {
@@ -103,13 +99,11 @@ func main() {
 		}
 		c, _ := HashID.Encode([]int{counter})
 
-		// create new room
 		uuidS := uuid.NewV4().String()
 		admin := Player{Name: colors[0], Color: colors[0], Admin: true, UUID: uuidS, Spy: false}
 		players := []Player{admin}
 		rooms[counter] = &Room{ID: counter, Players: players, Started: false}
 
-		// give admin a cookie with UUID
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 		http.SetCookie(w, &cookie)
@@ -137,17 +131,14 @@ func main() {
 				return
 			}
 
-			// create player, with unused color
 			uuidS := uuid.NewV4().String()
 			color := colors[len(room.Players)]
 			player := Player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
 
-			// set cookie with uuid
 			expiration := time.Now().Add(365 * 24 * time.Hour)
 			cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 			http.SetCookie(w, &cookie)
 
-			// add player to the room
 			room.Players = append(room.Players, player)
 
 			t, _ := template.ParseFiles("static/room.html")
