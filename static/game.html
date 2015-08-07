@@ -106,6 +106,19 @@ figcaption {
   }
 }
 
+@supports ( (scroll-snap-type: mandatory) or (-webkit-scroll-snap-type: mandatory) ) {
+  body {
+    scroll-snap-type: mandatory;
+    -webkit-scroll-snap-type: mandatory;
+    -webkit-scroll-snap-destination: 50% 50%;
+    scroll-snap-destination: 50% 50%;
+  }
+  figure {
+    -webkit-scroll-snap-coordinate: 50% 50%;
+    scroll-snap-coordinate: 50% 50%;
+  }
+}
+
 </style>
 </head>
 <body>
