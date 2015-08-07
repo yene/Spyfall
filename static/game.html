@@ -62,7 +62,7 @@ figcaption {
   color: red;
 }
 
-@media all and (max-width: 699px) { /*and (orientation : landscape)*/
+@media all and (max-width: 960px) { /*and (orientation : landscape)*/
   body {
     background: #ccc;
     padding: 0;
@@ -72,6 +72,7 @@ figcaption {
   }
 
   #countdown {
+    pointer-events: none;
     color: white;
     position: fixed;
     top: 0;
@@ -83,6 +84,7 @@ figcaption {
   }
 
   #info {
+    pointer-events: none;
     color: white;
     position: fixed;
     top: 0;
@@ -92,6 +94,10 @@ figcaption {
     z-index: 2;
     padding-left: 10px;
     padding-right: 10px;
+  }
+
+  figcaption {
+    pointer-events: none;
   }
 
   figure img {
@@ -111,7 +117,7 @@ figcaption {
       You are the Spy
     {{ else }}
       {{$l := index .Cards .Location}}
-      Locations: {{$l.Name}}
+      Location: {{$l.Name}}
     {{ end }}
     </div>
     <div id="table">
