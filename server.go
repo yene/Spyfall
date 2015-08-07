@@ -28,19 +28,6 @@ type Card struct {
 	Path string `json:"path"`
 }
 
-type PageLobby struct {
-	ID     int
-	Code   string
-	Player Player
-}
-
-type PageGame struct {
-	Spy       bool
-	Location  int
-	Cards     []Card
-	Countdown int
-}
-
 type Room struct {
 	ID        int
 	Players   []Player `json:"players"`
@@ -109,8 +96,14 @@ func main() {
 		http.SetCookie(w, &cookie)
 
 		t, _ := template.ParseFiles("static/room.html")
-		p := &PageLobby{Code: c, ID: counter, Player: admin}
-		t.Execute(w, p)
+		data := struct {
+			ID     int
+			Code   string
+			Player Player
+		}{
+			ID: counter, Code: c, Player: admin,
+		}
+		t.Execute(w, data)
 		fmt.Println("created new room", c, counter)
 
 		counter++
@@ -142,8 +135,14 @@ func main() {
 			room.Players = append(room.Players, player)
 
 			t, _ := template.ParseFiles("static/room.html")
-			p := &PageLobby{Code: c, ID: roomID, Player: player}
-			t.Execute(w, p)
+			data := struct {
+				ID     int
+				Code   string
+				Player Player
+			}{
+				ID: roomID, Code: c, Player: player,
+			}
+			t.Execute(w, data)
 		} else {
 			http.Redirect(w, r, "/", 303)
 			return
@@ -167,8 +166,16 @@ func main() {
 			uuid := cookie.Value
 			player := room.playerForUUID(uuid)
 
-			p := &PageGame{Spy: player.Spy, Location: room.Location, Cards: cards, Countdown: room.Countdown}
-			t.Execute(w, p)
+			data := struct {
+				Spy       bool
+				Location  int
+				Cards     []Card
+				Countdown int
+			}{
+				Spy: player.Spy, Location: room.Location, Cards: cards, Countdown: room.Countdown,
+			}
+
+			t.Execute(w, data)
 		} else {
 			http.NotFound(w, r)
 			return
