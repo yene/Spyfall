@@ -67,6 +67,7 @@ func (r *Room) setup() {
 func main() {
 	var (
 		httpAddr = flag.String("http", ":3000", "HTTP service address")
+		salt     = flag.String("salt", "super secret salt", "Salt is the secret used to make the generated id harder to guess")
 	)
 	flag.Parse()
 
@@ -74,7 +75,7 @@ func main() {
 	json.Unmarshal([]byte(cardsJSON), &cards)
 
 	hd := hashids.NewData()
-	hd.Salt = "super secret salt"
+	hd.Salt = *salt
 	hd.MinLength = 5
 	hd.Alphabet = "abcdefghijklmnopqrstuvwxyz"
 	HashID = hashids.NewWithData(hd)

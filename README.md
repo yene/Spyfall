@@ -9,15 +9,14 @@ fswatch-run *.go ./server.sh
 ```
 
 ## Todo
-* Go online: put on my server
 * Free memory: remove old rooms based on the timestamp
 * Add different themes (maybe archer, james bond, original)
 * Error Messages: notify user what went wrong, maybe little info box
 * Mobile: figure should have 100% vh/vw, the coundown and status should overlap, no whitespace
 * Test concurrency: write a http test and hammer into the server, i think there is a bug
 * split code into multiple files
-* move settings into cmd arguments
 * add godoc
+* link to a page with the rules
 
 ## Maybe Features
 * let the user set the countdown time
