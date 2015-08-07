@@ -47,13 +47,21 @@ type Player struct {
 	Spy   bool   `json:"-"`
 }
 
-func (r Room) playerForUUID(uuid string) Player {
+func (r Room) playerForUUID(uuid string) (p Player, found bool) {
 	for _, value := range r.Players {
 		if value.UUID == uuid {
-			return value
+			return value, true
 		}
 	}
-	return Player{"Grey", "grey", false, "", false} // TODO: return error and handle it
+	return Player{}, false
+}
+
+func (r Room) playerForCookies(cookies []*http.Cookie) (p Player, found bool) {
+	if len(cookies) == 0 {
+		return Player{}, false
+	}
+
+	return r.playerForUUID(cookies[0].Value) // TODO: dont take first cookie, search for spyfall cookie
 }
 
 func (r *Room) setup() {
@@ -112,6 +120,9 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
+		roomsMU.Lock()
+		defer roomsMU.Unlock()
+
 		c := r.URL.Query().Get("code")
 
 		d := HashID.Decode(c)
@@ -123,9 +134,9 @@ func main() {
 			}
 			var player Player
 
-			// TODO check if there is a cookie set
-			if len(r.Cookies()) == 0 {
-				// create new user and join
+			if p, ok := room.playerForCookies(r.Cookies()); ok {
+				player = p
+			} else {
 				uuidS := uuid.NewV4().String()
 				color := colors[len(room.Players)]
 				player = Player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
@@ -135,12 +146,6 @@ func main() {
 				http.SetCookie(w, &cookie)
 
 				room.Players = append(room.Players, player)
-			} else {
-				cookie := r.Cookies()[0]
-				// load player
-				uuid := cookie.Value
-				// check if player is registered
-				player = room.playerForUUID(uuid)
 			}
 
 			t, _ := template.ParseFiles("static/room.html")
@@ -175,7 +180,11 @@ func main() {
 			t, _ := template.ParseFiles("static/game.html")
 			cookie := r.Cookies()[0]
 			uuid := cookie.Value
-			player := room.playerForUUID(uuid)
+			player, ok := room.playerForUUID(uuid)
+			if !ok {
+				http.NotFound(w, r)
+				return
+			}
 
 			data := struct {
 				Spy       bool
