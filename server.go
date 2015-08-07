@@ -53,7 +53,7 @@ func (r Room) playerForUUID(uuid string) Player {
 			return value
 		}
 	}
-	return Player{"Grey", "grey", false, "", false} // TODO: return error
+	return Player{"Grey", "grey", false, "", false} // TODO: return error and handle it
 }
 
 func (r *Room) setup() {
@@ -101,45 +101,47 @@ func main() {
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 		http.SetCookie(w, &cookie)
-
-		t, _ := template.ParseFiles("static/room.html")
-		data := struct {
-			ID     int
-			Code   string
-			Player Player
-		}{
-			ID: counter, Code: c, Player: admin,
-		}
-		t.Execute(w, data)
 		fmt.Println("created new room", c, counter)
 
 		counter++
+		http.Redirect(w, r, "/room?code="+c, 303)
 	})
 
-	http.HandleFunc("/room/join", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
+	http.HandleFunc("/room", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
 			http.NotFound(w, r)
 			return
 		}
-		r.ParseForm()
-		c := r.Form["Code"][0]
+		c := r.URL.Query().Get("code")
+
 		d := HashID.Decode(c)
 		roomID := d[0]
 		if room, ok := rooms[roomID]; ok {
 			if room.Started {
-				http.Redirect(w, r, "/", 303) // TODO: show message that room started
+				http.Redirect(w, r, "/", 303) // TODO: show error message that room already started
 				return
 			}
+			var player Player
 
-			uuidS := uuid.NewV4().String()
-			color := colors[len(room.Players)]
-			player := Player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
+			// TODO check if there is a cookie set
+			if len(r.Cookies()) == 0 {
+				// create new user and join
+				uuidS := uuid.NewV4().String()
+				color := colors[len(room.Players)]
+				player = Player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
 
-			expiration := time.Now().Add(365 * 24 * time.Hour)
-			cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
-			http.SetCookie(w, &cookie)
+				expiration := time.Now().Add(365 * 24 * time.Hour)
+				cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
+				http.SetCookie(w, &cookie)
 
-			room.Players = append(room.Players, player)
+				room.Players = append(room.Players, player)
+			} else {
+				cookie := r.Cookies()[0]
+				// load player
+				uuid := cookie.Value
+				// check if player is registered
+				player = room.playerForUUID(uuid)
+			}
 
 			t, _ := template.ParseFiles("static/room.html")
 			data := struct {
