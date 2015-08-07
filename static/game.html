@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Spyfall</title>
   <link rel="stylesheet" type="text/css" href="/tacit.min.css"/>
-</head>
 <script>
 var timer;
 
@@ -35,61 +34,100 @@ function updateCountdown() {
 
 </script>
 <style>
-ul {
-  margin: 0;
-  list-style-type: none;
+#table {
   display: inline-flex;
 }
 
 figure {
-     position: relative;
+  position: relative;
 }
 figure img {
-    display: block;
+  display: block;
+  height: 600px;
+  width: 960px;
 }
 figcaption {
-    background: rgba(0, 0, 0, 0.5);
-    color: #FFF;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding-left: 10px;
-    font-size: 30px;
-    line-height: 40px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #FFF;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-left: 10px;
+  font-size: 30px;
+  line-height: 40px;
 }
 
 .currentLocation {
   color: red;
 }
 
+@media all and (max-width: 699px) { /*and (orientation : landscape)*/
+  body {
+    background: #ccc;
+    padding: 0;
+  }
+  h1 {
+    display: none;
+  }
+
+  #countdown {
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5);
+    width: 60px;
+    text-align: center;
+    z-index: 2;
+  }
+
+  #info {
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 60px;
+    background: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    z-index: 2;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  figure img {
+    width: 100vw;
+    height: calc(62.5vw); /*100/960*600*/
+  }
+}
+
 </style>
+</head>
 <body>
   <section>
-  <a href="/"><h1>Spyfall</h1></a>
-  <div id="countdown"></div>
-  {{ if .Spy }}
-    <p>You are the Spy</p>
-  {{ else }}
-    {{$l := index .Cards .Location}}
-    <p>Locations: {{$l.Name}}</p>
-  {{ end }}
-  <ul>
-    {{range $index, $element := .Cards}}
-    <li>
-      <figure>
-        <img src="/cards/{{.Path}}" width="960" height="600">
-        {{if $.Spy }}
-        <figcaption>{{.Name}}</figcaption>
-        {{else if eq $index $.Location }}
-        <figcaption class="currentLocation">{{.Name}}</figcaption>
-        {{ else }}
-        <figcaption>{{.Name}}</figcaption>
-        {{end}}
-      </figure>
-    </li>
-    {{end}}
-  </ul>
+    <a href="/"><h1>Spyfall</h1></a>
+    <div id="countdown"></div>
+    <div id="info">
+    {{ if .Spy }}
+      You are the Spy
+    {{ else }}
+      {{$l := index .Cards .Location}}
+      Locations: {{$l.Name}}
+    {{ end }}
+    </div>
+    <div id="table">
+      {{range $index, $element := .Cards}}
+        <figure>
+          <img src="/cards/{{.Path}}">
+          {{if $.Spy }}
+          <figcaption>{{.Name}}</figcaption>
+          {{else if eq $index $.Location }}
+          <figcaption class="currentLocation">{{.Name}}</figcaption>
+          {{ else }}
+          <figcaption>{{.Name}}</figcaption>
+          {{end}}
+        </figure>
+      {{end}}
+    </div>
   </section>
 </body>
 </html>
