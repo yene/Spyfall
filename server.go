@@ -10,6 +10,7 @@ import (
 	"math/rand"
 	"net/http"
 	"strconv"
+	"sync"
 	"time"
 )
 import (
@@ -18,7 +19,9 @@ import (
 )
 
 var rooms = make(map[int]*Room)
+var roomsMU sync.Mutex
 var counter int = 0
+
 var cards []Card
 var HashID *hashids.HashID
 var colors = []string{"Magenta", "LightSlateGray", "PaleVioletRed", "Peru", "RebeccaPurple", "LightSeaGreen", "Tomato", "SeaGreen", "Maroon", "GoldenRod", "DarkSlateBlue"}
@@ -85,6 +88,9 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
+		roomsMU.Lock()
+		defer roomsMU.Unlock()
+
 		c, _ := HashID.Encode([]int{counter})
 
 		uuidS := uuid.NewV4().String()
@@ -157,6 +163,8 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
+		roomsMU.Lock()
+		defer roomsMU.Unlock()
 		if room, ok := rooms[roomID]; ok {
 			if room.Started == false {
 				room.setup()
@@ -190,6 +198,8 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
+		roomsMU.Lock()
+		defer roomsMU.Unlock()
 		if room, ok := rooms[roomID]; ok {
 			js, err := json.Marshal(room)
 			if err != nil {
