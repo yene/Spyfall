@@ -96,6 +96,16 @@ figcaption {
     padding-right: 10px;
   }
 
+  #quit {
+    color: white;
+    position: fixed;
+    top: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.5);
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
   figcaption {
     pointer-events: none;
   }
@@ -147,6 +157,7 @@ figcaption {
         </figure>
       {{end}}
     </div>
+    <a id="quit" href="/" onclick="return confirm('Are you sure?')">Exit</a>
   </section>
 </body>
 </html>
