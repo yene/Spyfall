@@ -70,7 +70,7 @@ func (r *Room) setup() {
 	r.Players[spy].Spy = true
 
 	t := int(time.Now().Unix())
-	t = t + (60 * 10)
+	t = t + (60 * 8)
 	r.Countdown = t
 	r.Started = true
 }
