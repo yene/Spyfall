@@ -17,6 +17,7 @@ fswatch-run *.go ./server.sh
 * split code into multiple files
 * add godoc
 * link to a page with the rules
+* iOS 9 bug with viewport size
 
 ## Maybe Features
 * let the user set the countdown time
@@ -25,4 +26,5 @@ fswatch-run *.go ./server.sh
 * notify when player leaves lobby or game
 
 ## TIL
+* iOS 9 can only use scroll snap on body
 * backdrop filter does not seem to work with figure: http://iamvdo.me/en/blog/advanced-css-filters
