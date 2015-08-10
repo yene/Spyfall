@@ -14,10 +14,10 @@ fswatch-run *.go ./server.sh
 * Error Messages: notify user what went wrong, maybe little info box
 * Mobile: figure should have 100% vh/vw, the coundown and status should overlap, no whitespace
 * Test concurrency: write a http test and hammer into the server, i think there is a bug
-* split code into multiple files
 * add godoc
 * link to a page with the rules
 * iOS 9 bug with viewport size
+* add disclaimer like on http://spyfall.meteor.com/
 
 ## Maybe Features
 * let the user set the countdown time

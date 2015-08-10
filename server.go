@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
 	"sync"
@@ -20,60 +19,16 @@ import (
 
 var rooms = make(map[int]*Room)
 var roomsMU sync.Mutex
-var counter int = 0
+var counter int
 
-var cards []Card
-var HashID *hashids.HashID
-var colors = []string{"Magenta", "LightSlateGray", "PaleVioletRed", "Peru", "RebeccaPurple", "LightSeaGreen", "Tomato", "SeaGreen", "Maroon", "GoldenRod", "DarkSlateBlue"}
-
-type Card struct {
+type card struct {
 	Name string `json:"name"`
 	Path string `json:"path"`
 }
 
-type Room struct {
-	ID        int
-	Players   []Player `json:"players"`
-	Started   bool     `json:"started"`
-	Location  int      `json:"-"`
-	Countdown int      `json:"-"`
-}
-
-type Player struct {
-	Name  string `json:"name"`
-	Color string `json:"color"`
-	Admin bool   `json:"-"`
-	UUID  string `json:"-"`
-	Spy   bool   `json:"-"`
-}
-
-func (r Room) playerForUUID(uuid string) (p Player, found bool) {
-	for _, value := range r.Players {
-		if value.UUID == uuid {
-			return value, true
-		}
-	}
-	return Player{}, false
-}
-
-func (r Room) playerForCookies(cookies []*http.Cookie) (p Player, found bool) {
-	if len(cookies) == 0 {
-		return Player{}, false
-	}
-
-	return r.playerForUUID(cookies[0].Value) // TODO: dont take first cookie, search for spyfall cookie
-}
-
-func (r *Room) setup() {
-	r.Location = rand.Intn(len(cards))
-	spy := rand.Intn(len(r.Players))
-	r.Players[spy].Spy = true
-
-	t := int(time.Now().Unix())
-	t = t + (60 * 8)
-	r.Countdown = t
-	r.Started = true
-}
+var cards []card
+var hashID *hashids.HashID
+var colors = []string{"Magenta", "LightSlateGray", "PaleVioletRed", "Peru", "RebeccaPurple", "LightSeaGreen", "Tomato", "SeaGreen", "Maroon", "GoldenRod", "DarkSlateBlue"}
 
 func main() {
 	var (
@@ -89,7 +44,7 @@ func main() {
 	hd.Salt = *salt
 	hd.MinLength = 5
 	hd.Alphabet = "abcdefghijklmnopqrstuvwxyz"
-	HashID = hashids.NewWithData(hd)
+	hashID = hashids.NewWithData(hd)
 
 	http.HandleFunc("/room/new", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
@@ -99,11 +54,11 @@ func main() {
 		roomsMU.Lock()
 		defer roomsMU.Unlock()
 
-		c, _ := HashID.Encode([]int{counter})
+		c, _ := hashID.Encode([]int{counter})
 
 		uuidS := uuid.NewV4().String()
-		admin := Player{Name: colors[0], Color: colors[0], Admin: true, UUID: uuidS, Spy: false}
-		players := []Player{admin}
+		admin := player{Name: colors[0], Color: colors[0], Admin: true, UUID: uuidS, Spy: false}
+		players := []player{admin}
 		rooms[counter] = &Room{ID: counter, Players: players, Started: false}
 
 		expiration := time.Now().Add(365 * 24 * time.Hour)
@@ -125,36 +80,36 @@ func main() {
 
 		c := r.URL.Query().Get("code")
 
-		d := HashID.Decode(c)
+		d := hashID.Decode(c)
 		roomID := d[0]
 		if room, ok := rooms[roomID]; ok {
 			if room.Started {
 				http.Redirect(w, r, "/", 303) // TODO: show error message that room already started
 				return
 			}
-			var player Player
+			var newPlayer player
 
 			if p, ok := room.playerForCookies(r.Cookies()); ok {
-				player = p
+				newPlayer = p
 			} else {
 				uuidS := uuid.NewV4().String()
 				color := colors[len(room.Players)]
-				player = Player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
+				newPlayer = Player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
 
 				expiration := time.Now().Add(365 * 24 * time.Hour)
 				cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 				http.SetCookie(w, &cookie)
 
-				room.Players = append(room.Players, player)
+				room.Players = append(room.Players, newPlayer)
 			}
 
 			t, _ := template.ParseFiles("static/room.html")
 			data := struct {
 				ID     int
 				Code   string
-				Player Player
+				Player player
 			}{
-				ID: roomID, Code: c, Player: player,
+				ID: roomID, Code: c, Player: newPlayer,
 			}
 			t.Execute(w, data)
 		} else {
@@ -189,7 +144,7 @@ func main() {
 			data := struct {
 				Spy       bool
 				Location  int
-				Cards     []Card
+				Cards     []card
 				Countdown int
 			}{
 				Spy: player.Spy, Location: room.Location, Cards: cards, Countdown: room.Countdown,
