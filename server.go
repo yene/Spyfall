@@ -94,7 +94,7 @@ func main() {
 			} else {
 				uuidS := uuid.NewV4().String()
 				color := colors[len(room.Players)]
-				newPlayer = Player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
+				newPlayer = player{Name: color, Color: color, Admin: false, UUID: uuidS, Spy: false}
 
 				expiration := time.Now().Add(365 * 24 * time.Hour)
 				cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
