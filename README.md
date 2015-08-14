@@ -1,6 +1,10 @@
 # Spyfall
 The Card Game Spyfall implemented with images. Backend is written in go as exercise.
 
+![screenshot](material/screenshot.png)
+
+
+
 ## Run
 I am using fswatch to restart the server when the code changes.
 ```
@@ -25,3 +29,7 @@ fswatch-run *.go ./server.sh
 * iOS 9 body element will always resize it self cant use overflow, it requires a wrapper with overflow
 * iOS 9 requires `overflow-x: scroll;-webkit-overflow-scrolling: touch; ` for fluid scrolling
 * backdrop filter does not seem to work with figure: http://iamvdo.me/en/blog/advanced-css-filters
+
+## Inspired
+by the best party game on the PC
+![jackbox.tv](material/jackbox.jpg)
