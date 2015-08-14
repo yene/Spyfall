@@ -34,6 +34,11 @@ function updateCountdown() {
 
 </script>
 <style>
+body {
+  background: #ccc;
+  padding: 0;
+}
+
 #table {
   display: inline-flex;
 }
@@ -63,12 +68,13 @@ figcaption {
 }
 
 @media all and (max-width: 960px) { /*and (orientation : landscape)*/
-  body {
-    background: #ccc;
-    padding: 0;
-  }
   h1 {
     display: none;
+  }
+
+  #wrapper {
+    overflow-x: scroll;
+    -webkit-overflow-scrolling: touch;
   }
 
   #countdown {
@@ -110,14 +116,19 @@ figcaption {
     pointer-events: none;
   }
 
-  figure img {
+  figure {
     width: 100vw;
     height: calc(62.5vw); /*100/960*600*/
+  }
+
+  figure img {
+    width: 100%;
+    height: 100%;
   }
 }
 
 @supports ( (scroll-snap-type: mandatory) or (-webkit-scroll-snap-type: mandatory) ) {
-  body {
+  #wrapper {
     scroll-snap-type: mandatory;
     -webkit-scroll-snap-type: mandatory;
     -webkit-scroll-snap-destination: 50% 50%;
@@ -132,7 +143,7 @@ figcaption {
 </style>
 </head>
 <body>
-  <section>
+  <section id="wrapper">
     <a href="/"><h1>Spyfall</h1></a>
     <div id="countdown"></div>
     <div id="info">
