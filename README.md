@@ -13,11 +13,11 @@ fswatch-run *.go ./server.sh
 ```
 
 ## Todo
-* Free memory: remove old rooms based on the timestamp
-* Add different themes (maybe archer, james bond, original)
-* Error Messages: notify user what went wrong, maybe little info box
-* Test concurrency: write a http test and hammer into the server, i think there is a bug
-* add godoc
+- [ ]  Free memory: remove old rooms based on the timestamp
+- [ ]  Add different themes (maybe archer, james bond, original)
+- [ ]  Error Messages: notify user what went wrong, maybe little info box
+- [ ]  Test concurrency: write a http test and hammer into the server, i think there is a bug
+- [ ]  add godoc
 
 ## Maybe Features
 * let the user set the countdown time
@@ -31,5 +31,5 @@ fswatch-run *.go ./server.sh
 * backdrop filter does not seem to work with figure: http://iamvdo.me/en/blog/advanced-css-filters
 
 ## Inspired
-by the best party game on the PC
+Inspired by the best party game on the PC [Jackbox Party Pack](http://jackboxgames.com/project/jbpp/).
 ![jackbox.tv](material/jackbox.jpg)
