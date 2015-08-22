@@ -17,9 +17,11 @@ import (
 	"github.com/speps/go-hashids"
 )
 
-var rooms = make(map[int]*Room)
-var roomsMU sync.Mutex
-var counter int
+var rooms struct {
+	sync.Mutex
+	r map[int]*Room
+	c int
+}
 
 type card struct {
 	Name string `json:"name"`
@@ -46,27 +48,29 @@ func main() {
 	hd.Alphabet = "abcdefghijklmnopqrstuvwxyz"
 	hashID = hashids.NewWithData(hd)
 
+	rooms.r = make(map[int]*Room)
+
 	http.HandleFunc("/room/new", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			http.NotFound(w, r)
 			return
 		}
-		roomsMU.Lock()
-		defer roomsMU.Unlock()
+		rooms.Lock()
+		defer rooms.Unlock()
 
-		c, _ := hashID.Encode([]int{counter})
+		c, _ := hashID.Encode([]int{rooms.c})
 
 		uuidS := uuid.NewV4().String()
 		admin := player{Name: colors[0], Color: colors[0], Admin: true, UUID: uuidS, Spy: false}
 		players := []player{admin}
-		rooms[counter] = &Room{ID: counter, Players: players, Started: false}
+		rooms.r[rooms.c] = &Room{ID: rooms.c, Players: players, Started: false}
 
 		expiration := time.Now().Add(365 * 24 * time.Hour)
 		cookie := http.Cookie{Name: "spyfall", Value: uuidS, Path: "/", Expires: expiration}
 		http.SetCookie(w, &cookie)
-		fmt.Println("created new room", c, counter)
+		fmt.Println("created new room", c, rooms.c)
 
-		counter++
+		rooms.c++
 		http.Redirect(w, r, "/room?code="+c, 303)
 	})
 
@@ -75,14 +79,14 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		roomsMU.Lock()
-		defer roomsMU.Unlock()
+		rooms.Lock()
+		defer rooms.Unlock()
 
 		c := r.URL.Query().Get("code")
 
 		d := hashID.Decode(c)
 		roomID := d[0]
-		if room, ok := rooms[roomID]; ok {
+		if room, ok := rooms.r[roomID]; ok {
 			if room.Started {
 				http.Redirect(w, r, "/", 303) // TODO: show error message that room already started
 				return
@@ -125,9 +129,9 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		roomsMU.Lock()
-		defer roomsMU.Unlock()
-		if room, ok := rooms[roomID]; ok {
+		rooms.Lock()
+		defer rooms.Unlock()
+		if room, ok := rooms.r[roomID]; ok {
 			if room.Started == false {
 				room.setup()
 				fmt.Println("Started room", roomID)
@@ -164,9 +168,9 @@ func main() {
 			http.NotFound(w, r)
 			return
 		}
-		roomsMU.Lock()
-		defer roomsMU.Unlock()
-		if room, ok := rooms[roomID]; ok {
+		rooms.Lock()
+		defer rooms.Unlock()
+		if room, ok := rooms.r[roomID]; ok {
 			js, err := json.Marshal(room)
 			if err != nil {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
