@@ -35,7 +35,7 @@ function updateCountdown() {
 </script>
 <style>
 body {
-  background: #ccc;
+  background: white;
   padding: 0;
 }
 
@@ -158,13 +158,10 @@ figcaption {
     <div id="table">
       {{range $index, $element := .Cards}}
         <figure>
-          <img src="/cards/{{.Path}}">
-          {{if not $.Spy }}
-          <figcaption>{{.Name}}</figcaption>
+          <img src="/themes/custom/{{.Path}}">
+          {{if $.Spy }}
           {{else if eq $index $.Location }}
-          <figcaption class="currentLocation">{{.Name}}</figcaption>
-          {{ else }}
-          <figcaption>{{.Name}}</figcaption>
+          <figcaption class="currentLocation">Secret Location</figcaption>
           {{end}}
         </figure>
       {{end}}

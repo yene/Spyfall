@@ -39,7 +39,7 @@ func main() {
 	)
 	flag.Parse()
 
-	cardsJSON, _ := ioutil.ReadFile("static/cards/cards.json")
+	cardsJSON, _ := ioutil.ReadFile("static/themes/custom/cards.json")
 	json.Unmarshal([]byte(cardsJSON), &cards)
 
 	hd := hashids.NewData()

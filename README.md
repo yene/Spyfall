@@ -18,6 +18,7 @@ fswatch-run *.go ./server.sh
 - [ ]  Error Messages: notify user what went wrong, maybe little info box
 - [ ]  Test concurrency: write a http test and hammer into the server, i think there is a bug
 - [ ]  add godoc
+- [ ]  add 8min timer
 
 ## Maybe Features
 * let the user set the countdown time

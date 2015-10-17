@@ -1,0 +1,114 @@
+[
+  {
+    "name": "Airplane",
+    "path": "Airplane.jpg"
+  },
+  {
+    "name": "Arena",
+    "path": "Arena.jpg"
+  },
+  {
+    "name": "Bank",
+    "path": "Bank.jpg"
+  },
+  {
+    "name": "Bar",
+    "path": "Bar.jpg"
+  },
+  {
+    "name": "Battlefield",
+    "path": "Battlefield.jpg"
+  },
+  {
+    "name": "Brothel",
+    "path": "Brothel.jpg"
+  },
+  {
+    "name": "Casino",
+    "path": "Casino.jpg"
+  },
+  {
+    "name": "Cathedral",
+    "path": "Cathedral.jpg"
+  },
+  {
+    "name": "Circus",
+    "path": "Circus.jpg"
+  },
+  {
+    "name": "Court Room",
+    "path": "CourtRoom.jpg"
+  },
+  {
+    "name": "Desert Island",
+    "path": "DesertIsland.jpg"
+  },
+  {
+    "name": "Factory",
+    "path": "Factory.jpg"
+  },
+  {
+    "name": "Hospital",
+    "path": "Hospital.jpg"
+  },
+  {
+    "name": "Laboratory",
+    "path": "Laboratory.jpg"
+  },
+  {
+    "name": "Market",
+    "path": "Market.jpg"
+  },
+  {
+    "name": "Mars",
+    "path": "Mars.jpg"
+  },
+  {
+    "name": "Pirate Ship",
+    "path": "PirateShip.jpg"
+  },
+  {
+    "name": "Police Station",
+    "path": "PoliceStation.jpg"
+  },
+  {
+    "name": "Prison",
+    "path": "Prison.jpg"
+  },
+  {
+    "name": "Restaurant",
+    "path": "Restaurant.jpg"
+  },
+  {
+    "name": "School",
+    "path": "School.jpg"
+  },
+  {
+    "name": "Sewer",
+    "path": "Sewer.jpg"
+  },
+  {
+    "name": "Space Station",
+    "path": "SpaceStation.jpg"
+  },
+  {
+    "name": "Strip Club",
+    "path": "StripClub.jpg"
+  },
+  {
+    "name": "Submarine",
+    "path": "Submarine.jpg"
+  },
+  {
+    "name": "Subway",
+    "path": "Subway.jpg"
+  },
+  {
+    "name": "Swimming Pool",
+    "path": "SwimmingPool.jpg"
+  },
+  {
+    "name": "Theatre",
+    "path": "Theatre.jpg"
+  }
+]
