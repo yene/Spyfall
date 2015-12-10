@@ -9,7 +9,7 @@ The Card Game Spyfall implemented with images. Backend is written in go as exerc
 I am using fswatch to restart the server when the code changes.
 ```
 brew install fswatch
-fswatch-run *.go ./server.sh 
+fswatch -o *.go | xargs -n1 -I{} ./server.sh
 ```
 
 ## Todo
@@ -34,3 +34,9 @@ fswatch-run *.go ./server.sh
 ## Inspired
 Inspired by the best party game on the PC [Jackbox Party Pack](http://jackboxgames.com/project/jbpp/).
 ![jackbox.tv](material/jackbox.jpg)
+
+## Implementation Review
+* On iPhone 4s landscape you cannot really see anything because of the Safari browser bars.
+* Depending on playercount the game requires roles or less cards.
+* 
+
